@@ -12,22 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Send message to Discord
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const message = context.payload.issue.title; // El título del issue será el mensaje
-            const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-
-            await fetch(webhookUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ content: message }),
-            }).then(response => {
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
-            }).catch(error => {
-              console.error('There was a problem with the fetch operation:', error);
-            });
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          MESSAGE="${{ github.event.issue.title }}"
+          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+          curl -X POST -H "Content-Type: application/json" -d "{\"content\": \"${MESSAGE}\"}" "$WEBHOOK_URL"
