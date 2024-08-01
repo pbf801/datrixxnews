@@ -1,0 +1,34 @@
+name: Send Message to Discord
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  send-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Send message to Discord
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fetch = require('node-fetch');
+            const message = context.payload.issue.title; // El título del issue será el mensaje
+            const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+
+            fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: message }),
+            }).then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+            }).catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+            });
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
