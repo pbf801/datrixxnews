@@ -15,11 +15,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const fetch = require('node-fetch');
             const message = context.payload.issue.title; // El título del issue será el mensaje
             const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
 
-            fetch(webhookUrl, {
+            await fetch(webhookUrl, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ content: message }),
